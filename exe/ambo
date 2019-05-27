@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'ambo'
+
+begin
+  Ambo.load(Dir.getwd)
+rescue Ambo::Error => error
+  warn 'An error occurred while running AMBo'
+  warn "#{error.class}: #{error.message}"
+  warn error.backtrace.join("\n") unless ENV['DEBUG'].nil?
+end
