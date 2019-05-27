@@ -24,6 +24,25 @@ Or install it yourself as:
 design begins to solidify, complete usage docs as well as automated
 tests will be added to this project. Standby!!
 
+### Example
+
+A basic Twitter bot
+
+```ruby
+# Tweet under the @RandomEmojiBot account
+tweet_as 'RandomEmojiBot'
+
+# Tweet every 4 to 8 hours
+# Allow repeats after 20 messages
+every 4.hours, 8.hours, repeat_after: 20
+
+# This block is called to generate a new message
+next_message do
+ ["😀", "😁", "😂", "😃", "😄", "😅", "😆", "😇", "😈", "😉", "😊",
+  "😋", "😌", "😍", "😎", "😏", "😛", "😜", "😝", "🙂", "🙃", "🙄"].sample
+end
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies.
