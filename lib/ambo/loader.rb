@@ -1,4 +1,8 @@
+# frozen_string_literal: true
+
 module Ambo
+  # Parses and loads into bot via the {Context} class. This class then calls
+  # {Ambo::Loaded#wait_until_exit!} and blocks until the program is shutdown
   class Loader
     include Loggable
 
@@ -9,7 +13,6 @@ module Ambo
 
     def load!
       info_log "Started with pid #{Process.pid}"
-      info_log 'Loading bots'
 
       each_file do |file|
         eval_context file
@@ -27,8 +30,10 @@ module Ambo
     private
 
     def eval_context(file)
-      @runner << Context.new.tap do |ctx|
-        ctx.instance_eval(File.read(file), file)
+      bot_name = File.basename(file, File.extname(file))
+
+      @runner << Context.new(bot_name).tap do |ctx|
+        ctx.instance_eval File.read(file), file
         ctx.config.compile_methods!
       end
     end

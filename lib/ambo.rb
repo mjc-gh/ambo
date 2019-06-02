@@ -1,16 +1,21 @@
+# frozen_string_literal: true
+
 require 'active_support'
 require 'active_support/core_ext'
 require 'concurrent'
 require 'logger'
+require 'redis'
 
 require 'ambo/version'
 
 require 'ambo/concerns/loggable'
 require 'ambo/loader'
 require 'ambo/runner'
+require 'ambo/state'
+require 'ambo/store'
 
 require 'ambo/contexts/twitter'
-#require 'ambo/context/slack'
+# require 'ambo/context/slack'
 require 'ambo/contexts/periodic'
 require 'ambo/context'
 
@@ -18,8 +23,9 @@ require 'ambo/tasks/periodic'
 require 'ambo/task'
 
 require 'ambo/deliveries/twitter'
-#require 'ambo/deliveries/slack'
+# require 'ambo/deliveries/slack'
 
+# Main module for the AMBo framework
 module Ambo
   Error = Class.new(StandardError)
   LoaderError = Class.new(Error)
@@ -28,7 +34,9 @@ module Ambo
 
   def self.logger
     @logger ||= Logger.new($stdout).tap do |l|
-      l.level = Logger.const_get(ENV.fetch('AMBO_LOG_LEVEL') { 'DEBUG' }.upcase.to_sym)
+      level = ENV.fetch('AMBO_LOG_LEVEL') { 'DEBUG' }.upcase.to_sym
+
+      l.level = Logger.const_get(level)
       l.formatter = proc do |severity, datetime, progname, msg|
         progname ||= 'Unknown'
         time_str = datetime.utc.strftime('%d/%b/%Y:%H:%M:%S %z')
@@ -43,14 +51,12 @@ module Ambo
   end
 
   def self.safely_require(gem_name)
-    begin
-      require gem_name
-    rescue LoaderError => _
-      debug_log "The gem #{gem_name} is not available"
-    end
+    require gem_name
+  rescue LoaderError => _e
+    debug_log "The gem #{gem_name} is not available"
   end
 
-  BEEP_BOOPS = %w(beep boop).freeze
+  BEEP_BOOPS = %w[beep boop].freeze
 
   def self.random_beep_boops # :nodoc:
     BEEP_BOOPS.sample.capitalize.tap do |str|

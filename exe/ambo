@@ -1,11 +1,12 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'ambo'
 
 begin
   Ambo.load(Dir.getwd)
-rescue Ambo::Error => error
+rescue Ambo::Error => e
   warn 'An error occurred while running AMBo'
-  warn "#{error.class}: #{error.message}"
-  warn error.backtrace.join("\n") unless ENV['DEBUG'].nil?
+  warn "#{e.class}: #{e.message}"
+  warn e.backtrace.join("\n") unless ENV['DEBUG'].nil?
 end

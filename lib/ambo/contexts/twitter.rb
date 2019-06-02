@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
 module Ambo
   class Context
+    # Context methods for defining bots that send messages to Twitter.
     module Twitter
-      CLIENT_CONFIG = %i(
+      CLIENT_CONFIG = %i[
         consumer_key consumer_secret access_token access_token_secret
-      ).freeze
+      ].freeze
 
       # @param [String] Twitter username string; the API key ENV variable
       #                 is inferred from this name
@@ -15,8 +18,8 @@ module Ambo
         config.twitter = CLIENT_CONFIG.each.with_object({}) do |key, memo|
           memo[key] = ENV.fetch(env_key_for(key))
         end
-      rescue KeyError => error
-        raise LoaderError.new "ENV variable missing; #{error}"
+      rescue KeyError => e
+        raise LoaderError, "ENV variable missing; #{e}"
       end
 
       # @return [TrueClass, FalseClass] check if Twitter is setup

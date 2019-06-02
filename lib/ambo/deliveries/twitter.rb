@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 module Ambo
   module Deliveries
+    # This class is responsible for deliverying messages to Twitter
+    # using the {Twitter::REST::Client} class.
     class Twitter
       include Loggable
 
@@ -21,13 +25,15 @@ module Ambo
       def send(msg_txt)
         info_log "Sending message to twitter; message=#{msg_txt.inspect}"
 
-        #@client.update msg_txt
+        # @client.update msg_txt
       end
 
       def self.twitter_installed?
         defined? ::Twitter
       end
 
+      # Tiny "null" class with a noop {NullClient#update} method. Able to avoid
+      # conditionals in {Ambo::Deliveries::Twitter#send}.
       class NullClient
         def update; end
       end
