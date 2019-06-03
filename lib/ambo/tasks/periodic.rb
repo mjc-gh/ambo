@@ -47,14 +47,16 @@ module Ambo
       end
 
       def scheduled_delay
-        delay = configured_delay - (Time.now.to_i - @last_sent.to_i)
+        delay = configured_delay
+        delay -= Time.now.to_i - @last_sent.to_i unless @last_sent.nil?
         delay.negative? ? 0 : delay
       end
 
       def configured_delay
-        if @options.key? :delay then @options[:delay].to_i
-        else rand(@options[:min]..@options[:max]).to_i
-        end
+        @options.fetch(:delay) { rand(@options[:min]..@options[:max]) }
+        # if @options.key? :delay then @options[:delay].to_i
+        # else rand(@options[:min]..@options[:max]).to_i
+        # end
       end
     end
   end

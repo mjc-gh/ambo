@@ -2,7 +2,7 @@
 
 module Ambo
   # This class is responsible for running and managing all bots. The
-  # {wait_until_exit!} method is called by the {Amob::Loader} class.
+  # {wait_until_exit!} method is called by the {Ambo::Loader} class.
   #
   # This class will also setup signal handlers for SIGINT and SIGTERM. Both
   # signals are trapped in order to gracefully shutdown the bots.

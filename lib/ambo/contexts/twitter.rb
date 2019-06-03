@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Ambo
-  class Context
+  module Contexts
     # Context methods for defining bots that send messages to Twitter.
     module Twitter
       CLIENT_CONFIG = %i[
@@ -24,7 +24,7 @@ module Ambo
 
       # @return [TrueClass, FalseClass] check if Twitter is setup
       def twitter?
-        config.respond_to? :twitter
+        !config.twitter.blank?
       end
 
       private

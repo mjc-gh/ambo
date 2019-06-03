@@ -30,15 +30,15 @@ module Ambo
   Error = Class.new(StandardError)
   LoaderError = Class.new(Error)
 
-  extend Loggable
+  LOG_OUTPUT = defined?(Minitest) ? 'log/test.log' : $stdout
 
   def self.logger
-    @logger ||= Logger.new($stdout).tap do |l|
+    @logger ||= Logger.new(LOG_OUTPUT).tap do |l|
       level = ENV.fetch('AMBO_LOG_LEVEL') { 'DEBUG' }.upcase.to_sym
 
       l.level = Logger.const_get(level)
       l.formatter = proc do |severity, datetime, progname, msg|
-        progname ||= 'Unknown'
+        progname ||= 'Ambo'
         time_str = datetime.utc.strftime('%d/%b/%Y:%H:%M:%S %z')
 
         "[#{severity}] [#{progname}] [#{time_str}] #{msg}\n"
@@ -52,8 +52,8 @@ module Ambo
 
   def self.safely_require(gem_name)
     require gem_name
-  rescue LoaderError => _e
-    debug_log "The gem #{gem_name} is not available"
+  rescue LoadError => _e
+    logger.debug "The gem #{gem_name} is not available"
   end
 
   BEEP_BOOPS = %w[beep boop].freeze

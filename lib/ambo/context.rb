@@ -6,10 +6,10 @@ module Ambo
   class Context
     include ActiveSupport::Configurable
 
-    include Context::Twitter
+    include Contexts::Twitter
     # include Context::Slack
 
-    include Context::Periodic
+    include Contexts::Periodic
     # include Context::Reply
 
     attr_reader :bot_name

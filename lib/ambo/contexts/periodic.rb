@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Ambo
-  class Context
+  module Contexts
     # Context methods for defining bots with Periodic functionality.
     module Periodic
       # @param min [ActiveSupport::Duration, Integer] minimum time to wait
@@ -32,14 +32,15 @@ module Ambo
 
       # @return [TrueClass, FalseClass] check if periodic is setup
       def periodic?
-        config.respond_to? :every
+        !config.every.blank?
       end
 
       private
 
       def validate(duration) # :nodoc:
         case duration
-        when ActiveSupport::Duration, Integer then duration.seconds
+        when ActiveSupport::Duration then duration.seconds.to_i
+        when Integer then duration
         else
           raise LoaderError, "Invalid duration: #{duration.inspect}; " /
                              'must be ActiveSupport::Duration or Integer'

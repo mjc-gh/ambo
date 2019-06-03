@@ -8,7 +8,7 @@ module Ambo
     end
 
     def update(ctx)
-      @history_size = ctx.config.every&.fetch(:repeat_after) || 1
+      @history_size = ctx.config.every&.fetch(:repeat_after, 1) || 1
     end
 
     def <<(msg_txt)
