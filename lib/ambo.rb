@@ -3,6 +3,7 @@
 require 'active_support'
 require 'active_support/core_ext'
 require 'concurrent'
+require 'connection_pool'
 require 'logger'
 require 'redis'
 

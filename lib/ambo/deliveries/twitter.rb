@@ -9,16 +9,9 @@ module Ambo
 
       def initialize(twitter_config)
         if self.class.installed?
-          @client = ::Twitter::REST::Client.new do |config|
-            config.consumer_key = twitter_config[:consumer_key]
-            config.consumer_secret = twitter_config[:consumer_secret]
-            config.access_token = twitter_config[:access_token]
-            config.access_token_secret = twitter_config[:access_token_secret]
-          end
+          initialize_twitter_client!(twitter_config)
         else
-          fatal_log 'Install the twitter gem to use this feature'
-
-          @client = NullClient.new
+          initialize_null_client!
         end
       end
 
@@ -30,6 +23,23 @@ module Ambo
 
       def self.installed?
         defined?(::Twitter) ? true : false
+      end
+
+      private
+
+      def initialize_twitter_client!(twitter_config)
+        @client = ::Twitter::REST::Client.new do |config|
+          config.consumer_key = twitter_config[:consumer_key]
+          config.consumer_secret = twitter_config[:consumer_secret]
+          config.access_token = twitter_config[:access_token]
+          config.access_token_secret = twitter_config[:access_token_secret]
+        end
+      end
+
+      def initialize_null_client!
+        fatal_log 'Install the twitter gem to use this feature'
+
+        @client = NullClient.new
       end
 
       # Tiny "null" class with a noop {NullClient#update} method. Able to avoid

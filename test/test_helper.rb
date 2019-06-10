@@ -4,6 +4,7 @@ $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'ambo'
 
 require 'minitest/autorun'
+require 'timecop'
 
 module Minitest
   class Test
@@ -31,6 +32,11 @@ module Minitest
       ENV.delete 'TWITTER_FOO_CONSUMER_SECRET'
       ENV.delete 'TWITTER_FOO_ACCESS_TOKEN'
       ENV.delete 'TWITTER_FOO_ACCESS_TOKEN_SECRET'
+    end
+
+    def clear_stores!
+      redis = Redis.new(url: Ambo::Store::REDIS_URL)
+      redis.keys('ambo:*').each { |key| redis.del key }
     end
   end
 end

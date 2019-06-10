@@ -1,8 +1,19 @@
 AllCops:
+  DisplayCopNames: true
   TargetRubyVersion: 2.6
-
-Metrics/MethodLength:
-  Max: 14
 
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
+
+Layout/AlignArguments:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/IndentFirstArrayElement:
+  EnforcedStyle: consistent
+
+Layout/LeadingCommentSpace:
+  Enabled: false
+
+
+Style/CaseEquality:
+  Enabled: false
