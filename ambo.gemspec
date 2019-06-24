@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'concurrent-ruby', '~> 1.1'
   spec.add_dependency 'connection_pool', '~> 2.2'
   spec.add_dependency 'redis', '~> 4.1'
+  spec.add_dependency 'tod', '~> 2.2'
 
   spec.add_runtime_dependency 'twitter', '~> 6.2'
 

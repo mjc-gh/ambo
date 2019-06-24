@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+tweet_as 'Foo'
+
+on 'Monday'
+at '12pm'
+
+next_message do
+  'This is a test'
+end

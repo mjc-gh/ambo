@@ -38,5 +38,9 @@ module Minitest
       redis = Redis.new(url: Ambo::Store::REDIS_URL)
       redis.keys('ambo:*').each { |key| redis.del key }
     end
+
+    def fixture_path
+      File.join(File.expand_path(__dir__), 'fixtures')
+    end
   end
 end

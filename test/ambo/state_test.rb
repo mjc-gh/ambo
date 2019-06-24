@@ -3,19 +3,6 @@
 require 'test_helper'
 
 class AmboStateTest < Minitest::Test
-  test '#clean? with no history' do
-    state = Ambo::State.new
-
-    assert state.clean?
-  end
-
-  test '#clean? with history' do
-    state = Ambo::State.new
-    state << 'msg'
-
-    refute state.clean?
-  end
-
   test '#last_sent with no history' do
     state = Ambo::State.new
 

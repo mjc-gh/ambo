@@ -40,6 +40,30 @@ class AmboContextsPeriodicTest < Minitest::Test
     assert_equal 4, @context.config.dig(:every, :max)
   end
 
+  test 'periodic on with single day of week' do
+    @context.on :friday
+
+    assert_equal %i[friday], @context.config[:on]
+  end
+
+  test 'periodic on with single short name day of week' do
+    @context.on :tue
+
+    assert_equal %i[tuesday], @context.config[:on]
+  end
+
+  test 'periodic on with multiple days of week' do
+    @context.on %i[tue Wednesday sunday]
+
+    assert_equal %i[tuesday wednesday sunday], @context.config[:on]
+  end
+
+  test 'periodic on with multiple days of week as strings' do
+    @context.on %w[Mon Thursday friday]
+
+    assert_equal %i[monday thursday friday], @context.config[:on]
+  end
+
   test 'next_message callback' do
     @context.next_message {}
 

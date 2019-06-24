@@ -31,6 +31,7 @@ module Ambo
 
     def eval_context(file)
       bot_name = File.basename(file, File.extname(file))
+      bot_name = File.basename(bot_name, '.ambo')
 
       @runner << Context.new(bot_name).tap do |ctx|
         ctx.instance_eval File.read(file), file

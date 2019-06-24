@@ -6,6 +6,7 @@ PATH
       concurrent-ruby (~> 1.1)
       connection_pool (~> 2.2)
       redis (~> 4.1)
+      tod (~> 2.2)
       twitter (~> 6.2)
 
 GEM
@@ -98,6 +99,7 @@ GEM
     thor (0.20.3)
     thread_safe (0.3.6)
     timecop (0.9.1)
+    tod (2.2.0)
     twitter (6.2.0)
       addressable (~> 2.3)
       buftok (~> 0.2.0)
