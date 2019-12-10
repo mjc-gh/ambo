@@ -34,13 +34,28 @@ module Minitest
       ENV.delete 'TWITTER_FOO_ACCESS_TOKEN_SECRET'
     end
 
-    def clear_stores!
-      redis = Redis.new(url: Ambo::Store::REDIS_URL)
-      redis.keys('ambo:*').each { |key| redis.del key }
+    def redis
+      @redis ||= Redis.new(url: 'redis://localhost:6379/13')
+    end
+
+    def clear_state!
+      @redis.keys('ambo:*').each { |key| redis.del key }
     end
 
     def fixture_path
       File.join(File.expand_path(__dir__), 'fixtures')
+    end
+
+    def assert_time_of_day(actual, hour:, min: 0, sec: 0, period: 1)
+      hour /= 2 if period == 2
+
+      expected_time_str = [
+        hour, min, sec
+      ].map { |n| n.to_s.ljust(2, '0') }.join(':')
+
+      expected_time_str << '.000000'
+
+      assert_equal expected_time_str, actual.to_time_s
     end
   end
 end

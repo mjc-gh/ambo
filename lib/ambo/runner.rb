@@ -10,19 +10,18 @@ module Ambo
     include Loggable
 
     def initialize
-      @deliveries = []
-      @tasks = []
-
-      @store = Store.new
+      @instances     = []
       @outbound_pool = Ambo::Task.create_pool
     end
 
     # @param [Ambo::Context] ctx Add new Bot context to the runner
     def <<(ctx)
-      state = @store.load_or_create(ctx)
+      state = State.new(ctx, redis_state_pool)
 
-      create_periodic_task(ctx, state) if ctx.periodic?
-      create_twitter_delivery(ctx) if ctx.twitter?
+      instance = Instance.new(ctx, state, @outbound_pool)
+      instance.run
+
+      @instances << instance
 
       self
     end
@@ -38,39 +37,16 @@ module Ambo
 
     private
 
-    def create_twitter_delivery(ctx)
-      @deliveries << Ambo::Deliveries::Twitter.new(ctx.config.twitter)
-    end
-
-    def create_periodic_task(ctx, state)
-      @tasks << Ambo::Tasks::Periodic.new(ctx.config.every, state) do
-        next if @outbound_pool.shuttingdown?
-
-        @outbound_pool << proc do
-          delivery_message(ctx, &ctx.config.on_next_message)
-        end
+    def redis_state_pool
+      @redis_pool = ConnectionPool.new(size: 5, timeout: 5) do
+        Redis.new(url: ENV.fetch('REDIS_URL') { 'redis://localhost:6379/12' })
       end
-    end
-
-    def delivery_message(ctx)
-      msg_txt = yield
-
-      update_state ctx, msg_txt
-
-      @deliveries.each { |dlvr| dlvr.send msg_txt }
-    end
-
-    def update_state(ctx, msg_txt)
-      state = @store.load_or_create(ctx)
-      state << msg_txt
-
-      @store.save(ctx, state)
     end
 
     def shutdown!
       info_log 'Shutting down bot runner'
 
-      @tasks.map(&:cancel)
+      @instances.map(&:shutdown!)
       @outbound_pool.shutdown
     end
 

@@ -4,6 +4,7 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'concurrent'
 require 'connection_pool'
+#require 'fugit'
 require 'logger'
 require 'redis'
 
@@ -12,15 +13,19 @@ require 'ambo/version'
 require 'ambo/concerns/loggable'
 require 'ambo/loader'
 require 'ambo/runner'
+require 'ambo/runner/instance'
 require 'ambo/state'
-require 'ambo/store'
 
 require 'ambo/contexts/twitter'
 # require 'ambo/context/slack'
 require 'ambo/contexts/periodic'
 require 'ambo/context'
 
-require 'ambo/tasks/periodic'
+require 'ambo/tasks/base_task'
+require 'ambo/tasks/cancelable'
+require 'ambo/tasks/schedulable'
+require 'ambo/tasks/periodic/every'
+require 'ambo/tasks/periodic/on_at'
 require 'ambo/task'
 
 require 'ambo/deliveries/twitter'
@@ -32,6 +37,10 @@ module Ambo
   LoaderError = Class.new(Error)
 
   LOG_OUTPUT = defined?(Minitest) ? 'log/test.log' : $stdout
+
+  DAYS_OF_WEEK = %i[
+    monday tuesday wednesday thursday friday saturday sunday
+  ].freeze
 
   def self.logger
     @logger ||= Logger.new(LOG_OUTPUT).tap do |l|

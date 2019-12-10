@@ -18,7 +18,7 @@ module Ambo
       def send(msg_txt)
         info_log "Sending message to twitter; message=#{msg_txt.inspect}"
 
-        @client.update msg_txt
+        #@client.update msg_txt
       end
 
       def self.installed?

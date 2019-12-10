@@ -25,19 +25,4 @@ class AmboContextsTwitterTest < Minitest::Test
     assert_equal 'c', @context.config.dig(:twitter, :access_token)
     assert_equal 'd', @context.config.dig(:twitter, :access_token_secret)
   end
-
-  test 'twitter? when not configured' do
-    @context.config.compile_methods!
-
-    refute @context.twitter?
-  end
-
-  test 'twitter? when configured' do
-    setup_twitter_env!
-
-    @context.tweet_as 'foo'
-    @context.config.compile_methods!
-
-    assert @context.twitter?
-  end
 end

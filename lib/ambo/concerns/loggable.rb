@@ -6,13 +6,14 @@ module Ambo
     extend ActiveSupport::Concern
 
     included do
-      progname name
+      self.progname = name
     end
 
     class_methods do
-      def progname(name = nil)
-        @progname = name[6..-1] if name
-        @progname
+      attr_reader :progname
+
+      def progname=(name)
+        @progname = name[6..-1]
       end
     end
 

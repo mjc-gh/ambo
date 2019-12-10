@@ -3,78 +3,52 @@
 require 'test_helper'
 
 class AmboStateTest < Minitest::Test
-  test '#last_sent with no history' do
-    state = Ambo::State.new
+  setup do
+    @state ||= begin
+                 ctx = Ambo::Context.new('test')
+                 pool = ConnectionPool.new(size: 1) { redis }
 
-    assert_nil state.last_sent
+                 Ambo::State.new(ctx, pool, history_limit: 10)
+               end
   end
 
-  test '#last_sent with history' do
-    Timecop.freeze do
-      state = Ambo::State.new
-      state << 'msg'
+  teardown { clear_state! }
 
-      assert_equal Time.now, state.last_sent
-    end
+  test 'add to history' do
+    @state << 'async' << 'media'
+
+    history = @redis.lrange('ambo:test:history', 0, -1)
+
+    assert_equal %w[media async], history
   end
 
-  test '#<< adds to history' do
-    Timecop.freeze do
-      state = Ambo::State.new
-      state << 'msg'
+  test 'truncates history' do
+    12.times { |n| @state << "msg #{n + 1}" }
 
-      assert_equal [
-        time: Time.now, message: 'msg'
-      ], state.history
-    end
+    assert_equal (2..12).map { |x| "msg #{x}" }.reverse, @state[0..10]
   end
 
-  test '#<< truncates history' do
-    Timecop.freeze do
-      state = Ambo::State.new
-      state << 'msg' << 'other'
+  test 'read from history' do
+    @state << 'async' << 'media'
 
-      assert_equal [
-        time: Time.now, message: 'other'
-      ], state.history
-    end
+    assert_equal 'async', @state[1]
   end
 
-  test '#<< truncates history with updated ctx configuration' do
-    Timecop.freeze do
-      ctx = Ambo::Context.new('foo_bot')
-      ctx.every 2.seconds, repeat_after: 2
+  test 'read from history with range' do
+    @state << 'async' << 'media' << 'bot'
 
-      state = Ambo::State.new
-      state.update(ctx)
-      state << 'one' << 'two' << 'three' << 'four'
-
-      assert_equal [
-        { time: Time.now, message: 'four' },
-        { time: Time.now, message: 'three' }
-      ], state.history
-    end
+    assert_equal %w[media async], @state[1..2]
   end
 
-  test '#<=> with unequal states' do
-    state1 = Ambo::State.new
-    state1 << 'foo'
+  test 'set property' do
+    @state[:foo, :bar] = 'baz'
 
-    state2 = Ambo::State.new
-    state2 << 'foo'
-
-    refute_equal state1, state2
+    assert_equal 'baz', @redis.get('ambo:test:foo:bar')
   end
 
-  test '#<=> with unequal states' do
-    Timecop.freeze do
-      state1 = Ambo::State.new
-      state1 << 'foo'
+  test 'get property' do
+    @state[:foo, :bar] = 'baz'
 
-      state2 = Ambo::State.new
-      state2 << 'foo'
-
-      assert_equal state1, state2
-    end
+    assert_equal 'baz', @state[:foo, :bar]
   end
 end

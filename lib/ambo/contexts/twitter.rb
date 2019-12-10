@@ -22,11 +22,6 @@ module Ambo
         raise LoaderError, "ENV variable missing; #{e}"
       end
 
-      # @return [TrueClass, FalseClass] check if Twitter is setup
-      def twitter?
-        !config.twitter.blank?
-      end
-
       private
 
       def env_key_for(type)
